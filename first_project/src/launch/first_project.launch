@@ -1,0 +1,21 @@
+<launch>
+	<param name = "latitude_init" 	type="double" value="45.621668"/>
+	<param name = "longitude_init" 	type="double" value="9.281553" />
+	<param name = "h0" 				type="double" value="224.573796"/>
+
+	<node name="car_node" 		pkg="first_project" type="lla2enu">
+		<remap from="/topic" to="/swiftnav/front/gps_pose"/>
+	</node>
+	
+	<node name="obs_node" 		pkg="first_project" type="lla2enu">
+		<remap from="/topic" to="/swiftnav/obs/gps_pose"/>
+	</node>
+
+	<node name="dist_service" 	pkg="first_project" type="computeDist"/>
+
+	<node name="data_publisher" pkg="first_project" type="publisher"/>
+	
+	<node name="rqt_reconfigure" pkg="rqt_reconfigure" type="rqt_reconfigure"/>
+	
+</launch>
+

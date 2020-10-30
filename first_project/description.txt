@@ -1,0 +1,60 @@
+Robotics - first project
+
+Group member:
+Hamza Haddaoui (Codice persona: 10583761 - matricola: 890610)  
+
+Content of the first_project folder:
+
+ - cfg    -> Dynamic reconfiguration file (Python script to cfg flag thresholds)
+ - launch -> Launch files (initial set point parameters, launches lla2enu nodes, distance service and publisher)
+ - msg    -> Custom message definition files ((float64) distance and (string) flag)
+ - srv    -> Service definition files (input: none, output: float64 distance)
+
+
+Custom message:
+float64 distance
+string flag 
+
+Structure of tf tree: 
+map is the root TF. car_node and obs_node are child frames.
+See attached file "frames.pdf"
+
+
+
+
+How to start everything: 
+ - roscore
+ - roslaunch first_project first_project.launch
+
+
+
+Other useful information 
+
+ - car.mov is the odom data visualized on riva (8x speed)
+
+ - The launch file, contains:
+   - the initial LLA set point parameters
+   - initialization of two lla2enu nodes, which performs the conversion from lla to enu and publishes odom and tf data;
+	the first node is remapped to subscribe to the car gps data
+	the second node is remapped to subscribe to the obstacle gps data
+   - initialization of the distance service
+   - initialization of the publisher
+   - Opens the rqt_reconfigure tool -> reconfiguring threshold data for the publisher.
+
+ - Distance service:
+The distance service uses an ApproximateTime synchronization for the ENU data from car and obstacle.
+When the two data are received, the distance is computed and then ready to be sent to the first client that requests it.
+An important thing is that 0.5 seconds after this event (the reception of the two data), the distance expires, so if a client asks for the distance after that time, no data will be provided.
+
+ - Publisher:
+The publisher calls the distance service at a defined frequency (5Hz) and depending on response publish
+es a message on his "data_publisher" topic.
+If the distance service replies with a value, a custom message is built, with the received distance, and a flag based on dynamic config values (unsafe threshold, crash threshold) which can be SAFE, UNSAFE, CRASH.
+If the distance service replies with an error, no data is available to be fetch, so the data_publisher will publish a nan distance value, with a NONE flag.
+
+    -Why 5Hz? Using rostopic hz on both odom topics, the minimum freq is 8Hz and the maximum is around 12Hz.
+Then since it is better to publish distance data at a lower frequency I decided to set this freq at 5Hz.
+
+
+
+

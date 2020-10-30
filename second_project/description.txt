@@ -1,0 +1,60 @@
+Second project of Robotics, year 2020.
+Made by Avvisati Giulio (ID 10608313) and Haddaoui Hamza (ID 10583761)
+
+Requests:
+1) Create maps using gmapping (both created with traj1)
+2) Configure move_base with amcl and the computed map by visual odom
+(optional)
+3) Improve visual odometry using IMU (both sensors)
+
+
+All provided solution require to move the folder "secondProject" to your catkin workspace src folder and launch the "catkin_make" command first (otherwise the command "$(find)" in yaml files won't work).
+Please note that if you set the DEBUG parameter to "true" the launch file will open rviz with a configuration file and make data visualization more comfortable.
+
+Some considerations:
+- To convert from pointcloud to laserscan we have excluded all point planes above the sensor. Doing so we create a map considering obstacles from the ground to the robot height to obtain a useful map for moving.
+- All the parameters used for the pointcloud have been taken from "https://ouster.com/products/os1-lidar-sensor" data sheet.
+- Basic components have been written in Xml files and merged into launch file to provide code readability and reuse of the same.
+- Move base has been configured to work with the provided frames and localization has been tested. Planner parameters are missing due to the impossibility of testing.
+- Most of the parameters about refresh and scan frequencies should be tuned depending on the used hardware.
+
+
+Structure of the TF tree:
+ - Optitrack generated tree:  world -> Robot_1/BaseLink -> os1_sensor 
+ - Visual generated tree: map -> camera_odom_frame -> camera_pose_frame -> os1_sensor
+
+
+
+Content of the secondproject folder:
+ - launch -> 
+		EKF_DataFusion.xml : Fuses the data from the visual odometry and the two IMUs 
+		pointCloud2LaserScan.xml : Converts the pointCloud data, to laser scan.
+		
+		amcl
+			amcl_config.xml : Configuration parameters for the amcl.
+			move_base_amcl.launch :	Launch file for the localization task.
+
+		map_generate
+			optitrack.launch: Launch file for mapping the environment with optitrack data.
+			visual.launch: Launch file for mapping the environment with visual odometry data.
+		
+ - map    -> Generated maps from the bag, for visual and optitrack odom
+ - rviz   -> Debug files for rviz visualization of the data
+
+
+
+Bags:
+ - Bag used to generate the map: 2020-05-14-16-09-36-traj1-os1-t265-pix.bag
+ - Bag used to test the localization: 2020-05-14-16-14-37-traj2-os1-t265-pix.bag
+
+
+How to start the mapping task:
+1. Roslaunch optitrack.launch/visual.launch
+2. Call "rosrun map_server map_saver -f map"
+
+How to start the navigation task:
+1. Roslaunch move_base_amcl.launch. (See the localization via rviz)
+
+
+
+

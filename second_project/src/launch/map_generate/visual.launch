@@ -1,0 +1,20 @@
+ <launch>
+ 	<arg name="DEBUG"           default="true"/>
+	<param name="use_sim_time" value="true"/>
+
+	<include file="$(find second_project)/launch/pointCloud2LaserScan.xml"/>
+
+	<include file="$(find second_project)/launch/EKF_DataFusion.xml"/>
+
+	<node name="gmapper" pkg="gmapping" type="slam_gmapping" output="screen">
+		<param name="odom_frame" value="camera_odom_frame"/>
+		<param name="base_frame" value="camera_pose_frame"/>
+	</node>
+	
+	<!--  ****** RViz config ******* -->
+  	<group if="$(arg DEBUG)">
+        <node name="rviz" pkg="rviz" type="rviz" args="-d $(find second_project)/rviz/amcl_test.rviz"/>
+    </group>
+	
+ 
+ </launch>

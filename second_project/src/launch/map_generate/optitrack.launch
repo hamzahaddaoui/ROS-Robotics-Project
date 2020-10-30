@@ -1,0 +1,19 @@
+<launch>
+	<arg name="DEBUG"           default="true"/>
+	<param name="use_sim_time" value="true" />w
+	
+	<include file="$(find second_project)/launch/pointCloud2LaserScan.xml"/>
+    
+    <node pkg="tf" type="static_transform_publisher" name="static_transform_publisher" args="0 0 0 3.14 0 0 Robot_1/base_link os1_sensor 100"/>
+    
+    <node pkg="gmapping" type="slam_gmapping" name="gmapping" args="scan:=/scan _base_frame:=Robot_1/base_link _odom_frame:=world">
+    	<param name="base_frame" value="Robot_1/base_link"/>
+    	<param name="odom_frame" value="world"/>
+    </node>
+    
+    <!--  ****** RViz config ******* -->
+  	<group if="$(arg DEBUG)">
+        <node name="rviz" pkg="rviz" type="rviz" args="-d $(find second_project)/rviz/amcl_test.rviz"/>
+    </group>
+
+</launch>
